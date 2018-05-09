@@ -1,0 +1,18 @@
+import java.util.Scanner;
+
+public class TestaString {
+
+	public static void main(String[] args) {
+		Scanner teclado = new Scanner(System.in);
+		
+		String msg = teclado.nextLine();
+		String[] aux = msg.split(":");
+		
+		System.out.println(aux[0]);
+		System.out.println(aux[1]);
+		
+		teclado.close();
+
+	}
+
+}

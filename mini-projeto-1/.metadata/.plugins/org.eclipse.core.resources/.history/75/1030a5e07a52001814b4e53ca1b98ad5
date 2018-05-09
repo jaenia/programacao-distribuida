@@ -1,0 +1,20 @@
+import java.util.Scanner;
+
+public class TestaString {
+
+	public static void main(String[] args) {
+		Scanner teclado = new Scanner(System.in);
+		
+		String msg = teclado.nextLine();
+		String[] aux = msg.split(":");
+		
+		String host = aux[0];
+		aux = msg.split("/");
+		String port = aux[0];
+		String file = aux[1];
+		
+		teclado.close();
+
+	}
+
+}

@@ -1,0 +1,17 @@
+import java.util.Scanner;
+
+public class TestaString {
+
+	public static void main(String[] args) {
+		Scanner teclado = new Scanner(System.in);
+		
+		String msg = teclado.nextLine();
+		String host = "teste";
+		
+		System.out.println(host.toString());
+		
+		teclado.close();
+
+	}
+
+}

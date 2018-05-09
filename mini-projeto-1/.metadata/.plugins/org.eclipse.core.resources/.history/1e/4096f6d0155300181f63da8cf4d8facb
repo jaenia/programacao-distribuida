@@ -1,0 +1,74 @@
+package br.edu.ifpb.tsi.pd;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.file.Files;
+import java.util.Scanner;
+
+public class ServidorWeb {
+
+	public static void main(String[] args) {
+		String file, status;
+		ServerSocket ss;
+		
+		try {
+			ss = new ServerSocket(4100);
+			Socket socket = ss.accept();
+			while(!ss.isClosed()) {
+				
+				ServidorThread st = new ServidorThread(socket);
+				st.start();
+			}
+			System.out.println("saiu do while");
+			ss.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		/*try {
+			ss = new ServerSocket(4102);
+			Socket socket = ss.accept();
+			if(socket.isConnected()) {
+				System.out.println("Conectou com " + socket.getInetAddress() + ":" + socket.getPort());
+				DataInputStream in = new DataInputStream(socket.getInputStream());
+				DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+				
+				//lógica
+				//recuperando nome do arquivo
+				file = in.readUTF();
+				System.out.println("Servidor recebeu: " + file);
+				
+				//buscando o arquivo
+				File arquivo = new File("C:\\Users\\jaeni\\Documents\\TSI - IFPB\\2018.1\\Programação Distribuída"
+						+ "\\workspace\\Mini Projetos\\Mini Projeto 1\\Servidor\\public\\" + file);
+				
+				if(arquivo.exists()) {
+					System.out.println("achou");
+					status = "200";
+					out.writeUTF(status);
+					String conteudo = new String(Files.readAllBytes(arquivo.toPath()));
+					//System.out.println(conteudo);
+					out.writeUTF("Conteúdo do arquivo: " + file + "\n" + conteudo);
+					
+				}else {
+					System.out.println("não achou");
+					status = "400";
+					out.writeUTF(status);
+				}
+			}
+			
+			socket.close();
+			ss.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+	}
+
+}

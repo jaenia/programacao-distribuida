@@ -1,0 +1,21 @@
+package br.edu.ifpb.tsi.pd;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Scanner;
+
+public class ClienteWeb {
+
+	public static void main(String[] args) {
+		System.out.println("criou a thread");
+		for(int i=2;i<2;i++) {
+			ClienteThread ct = new ClienteThread();
+			System.out.println("criou a thread");
+			ct.start();
+		}
+	}
+
+}
