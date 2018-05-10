@@ -1,0 +1,58 @@
+package br.edu.ifpb.tsi.pd;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Scanner;
+
+public class ClienteThread extends Thread {
+	private String msg, host, port, file_name;
+	
+	public ClienteThread() {}
+	
+	public void separateURL(String msg) {
+		String[] aux;
+		
+		aux = msg.split(":");
+		host = aux[0];
+		msg = aux[1];
+		aux = msg.split("/");
+		port = aux[0];
+		file_name = aux[1];
+	}
+	
+	public void run() {
+		String msg, status;
+		Scanner scanner = new Scanner(System.in);
+		
+		System.out.println("Thread atual no cliente: " + Thread.currentThread().getName());
+		System.out.println("Informe o endereço:");
+		msg = scanner.nextLine();
+		separateURL(msg);
+		
+		//teclado.close();
+		
+		try {
+			Socket socket = new Socket(host, Integer.parseInt(port));
+			DataInputStream in = new DataInputStream(socket.getInputStream());
+			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+			
+			//enviando nome do arquivo para o servidor
+			out.writeUTF(file_name);
+			
+			//recebendo o status
+			status = in.readUTF();
+			if(status.equals("200")) {
+				System.out.println(in.readUTF());
+			}else if(status.equals("400")) {
+				System.out.println("O arquivo" + file_name + " não foi encontrado! Envie um e-mail para jaeniaps@gmail.com relatando o problema.");
+			}
+			
+			socket.close();
+		} catch (IOException e) {
+			System.out.println("A conexão falhou! Envie um e-mail para jaeniaps@gmail.com relatando o problema.");
+		}	
+	}
+}

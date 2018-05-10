@@ -1,0 +1,70 @@
+package br.edu.ifpb.tsi.pd;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Scanner;
+
+public class ClienteThread extends Thread {
+	String msg, host, port, file_name;
+	
+	public ClienteThread() {}
+	
+	public void separateURL(String msg) {
+		String[] aux;
+		
+		
+	}
+	
+	public void run() {
+		String msg, host, port, file, status, conteudo;
+		Scanner teclado = new Scanner(System.in);
+		
+		
+		
+		System.out.println(Thread.currentThread().getName());
+		//separando a mensagem do usuário
+		System.out.println("Informe o endereço: ");
+		msg = teclado.nextLine();
+		aux = msg.split(":");
+		host = aux[0];
+		msg = aux[1];
+		aux = msg.split("/");
+		port = aux[0];
+		file = aux[1];
+		
+		//teclado.close();
+		//fim da separação
+		
+		try {
+			//básico de socket
+			
+			Socket socket = new Socket(host, Integer.parseInt(port));
+			DataInputStream in = new DataInputStream(socket.getInputStream());
+			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+			
+			//lógica
+			//enviando nome do arquivo para o servidor
+			out.writeUTF(file);
+			
+			//recebendo o status
+			status = in.readUTF();
+			if(status.equals("200")) {
+				System.out.println(in.readUTF());
+			}else if(status.equals("400")) {
+				System.out.println("Arquivo não existente!");
+			}
+			
+			socket.close();
+		} catch (EOFException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Fim do arquivo!");
+		} catch (IOException e) {
+			System.out.println("Falha na conexão");
+		}
+		
+	}
+
+}

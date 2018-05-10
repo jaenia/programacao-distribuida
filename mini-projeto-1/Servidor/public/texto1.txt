@@ -1,4 +1,1 @@
-Olá, eu sou o Texto 1!
-Olá
-Olá
-Olá
+Alô, eu sou o texto 1!
