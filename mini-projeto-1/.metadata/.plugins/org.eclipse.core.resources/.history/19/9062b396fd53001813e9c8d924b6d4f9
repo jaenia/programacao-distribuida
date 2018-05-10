@@ -26,7 +26,7 @@ public class ClienteThread extends Thread {
 		String msg, status;
 		Scanner scanner = new Scanner(System.in);
 		
-		System.out.println("[CT] Thread atual no cliente: " + Thread.currentThread().getName());
+		System.out.println("[CT] localhost:4101/texto1.txtThread atual no cliente: " + Thread.currentThread().getName());
 		System.out.println("Informe o endereço:");
 		msg = scanner.nextLine();
 		separateURL(msg);
