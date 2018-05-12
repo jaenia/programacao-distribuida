@@ -10,7 +10,7 @@ public class ServidorWeb {
 		ServerSocket serverSocket;
 		
 		try {
-			serverSocket = new ServerSocket(4100);
+			serverSocket = new ServerSocket(4101);
 			
 			while(!serverSocket.isClosed()) {
 				System.out.println("[SW] Servidor rodando em " + serverSocket.getInetAddress() + ":" + serverSocket.getLocalPort());

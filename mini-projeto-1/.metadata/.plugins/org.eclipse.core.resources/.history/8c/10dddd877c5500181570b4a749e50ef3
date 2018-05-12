@@ -51,7 +51,7 @@ public class ClienteThread extends Thread {
 			
 			socket.close();
 		} catch (IOException e) {
-			System.out.println("\nA conexão falhou!\n");
+			System.out.println("\nA conexão falhou! Envie um e-mail para jaeniaps@gmail.com relatando o problema.\n");
 		}	
 	}
 }
