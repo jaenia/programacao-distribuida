@@ -1,7 +1,11 @@
+package com.jaenia;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,8 +76,8 @@ public class ChatMultiSalasWSEndpoint {
             enviar(s, sala, un, message);
         }else if(message.startsWith("send")){
             enviarParaTodos(sala, un, message);
-        }else if(message.startsWith("rename ")){
-            //renomear(s, sala, un, message);
+        }else if(message.startsWith("rename")){
+            renomear(s, sala, un, message);
         }      
         return null;
     }
@@ -102,7 +106,71 @@ public class ChatMultiSalasWSEndpoint {
         return false;
     }
     
-    public void enviarParaTodos(String sala, String remet, String message){
+    public void enviarParaTodos(String sala, String usuario, String message){
+        //trata mensagem
+        String msgPura = message.substring(5);
+        ArrayList<Usuario> usuarios = salas.get(sala);
+        for(Usuario u : usuarios){
+            try {
+                u.getSession().getBasicRemote().sendText(usuario + " " + pegarHora() + 
+                            " " + msgPura);
+            } catch (IOException ex) {
+                Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    public void enviar(Session s, String sala, String usuario, String message){
+        //trata mensagem
+        String msgComNome = message.substring(8);
+        String[] aux = msgComNome.split(" ");
+        String nome = aux[0];
+        int tamanhoNome = nome.length();
+        String msgPura = msgComNome.substring(tamanhoNome + 1);
+        
+        //System.out.println(tamanhoNome + "\n" + msgComNome + "\n" + nome + "\n" + msgPura);
+     
+        ArrayList<Usuario> usuarios = salas.get(sala);
+        for(Usuario u : usuarios){
+            if(u.getUsername().equals(nome)){
+                try {
+                    u.getSession().getBasicRemote().sendText(usuario + " " + pegarHora() + 
+                            " reservadamente: " + msgPura);
+                } catch (IOException ex) {
+                    Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+    
+    public void renomear(Session s, String sala, String user, String message){
+        String novoNome = message.split(" ")[1];
+        //verifica se já existe usuário com o nome informado
+        if(existeUsuario(novoNome)){
+            try {
+                s.getBasicRemote().sendText("Esse nome nao está disponível");
+            } catch (IOException ex) {
+                Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            for(String st: salas.keySet()){
+                ArrayList<Usuario> usuarios = salas.get(st);
+                for(Usuario u: usuarios){
+                    if(u.getUsername().equals(user)){
+                        u.setUsername(novoNome);
+                        try {
+                            s.getBasicRemote().sendText("nome alterado com sucesso");
+                        } catch (IOException ex) {
+                            Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        notificarRenomeacaoTodos(sala, user, "O usuario " + user + " alterou seu nome para " + novoNome);
+                    }
+                }
+            }
+        }
+    }
+    
+    public void notificarRenomeacaoTodos(String sala, String remet, String message){
         ArrayList<Usuario> usuarios = salas.get(sala);
         for(Usuario u : usuarios){
             try {
@@ -113,28 +181,11 @@ public class ChatMultiSalasWSEndpoint {
         }
     }
     
-    public void enviar(Session s, String sala, String remet, String message){
-        String msgComNome = message.substring(8);
-        String[] aux = msgComNome.split(" ");
-        String nome = aux[0];
-        int tamanhoNome = nome.length();
-        String msgPura = msgComNome.substring(tamanhoNome + 1);
-        
-        System.out.println(tamanhoNome + "\n" + msgComNome + "\n" + nome + "\n" + msgPura);
-     
-        ArrayList<Usuario> usuarios = salas.get(sala);
-        for(Usuario u : usuarios){
-            if(u.getUsername().equals(nome)){
-                try {
-                    u.getSession().getBasicRemote().sendText(msgPura);
-                } catch (IOException ex) {
-                    Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-    
-    public void renomear(Session s, String sala, String user, String message){
-        String novoNome = message.split(" ")[1];
+    public String pegarHora(){
+        GregorianCalendar calendar = new GregorianCalendar();
+        String hora = Integer.toString(calendar.get(Calendar.HOUR_OF_DAY));
+        String minutos = Integer.toString(calendar.get(Calendar.MINUTE));
+        String horaCompleta = hora + ":" + minutos;
+        return horaCompleta;
     }
 }

@@ -1,3 +1,5 @@
+package com.jaenia;
+
 
 import javax.websocket.Session;
 
