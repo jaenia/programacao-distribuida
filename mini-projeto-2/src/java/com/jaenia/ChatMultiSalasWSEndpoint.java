@@ -49,11 +49,16 @@ public class ChatMultiSalasWSEndpoint {
             if(!existeUsuario(un)){
                 salas.get(sala).add(user);
             }else{
+                user.setUsername("anonimo");
+                System.out.println(user.getUsername());
                 try {
-                    s.getBasicRemote().sendText("Este usuário já está logado em outra sala.");
+                    s.getBasicRemote().sendText("Você logou com um username que já está sendo utilizado.\n"+
+                            "Seu nome sera anônimo até que você o renomeie.");
                 } catch (IOException ex) {
                     Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                salas.get(sala).add(user);
+                System.out.println(user.getUsername());
             }    
         }else{
             if(!existeUsuario(un)){
@@ -72,12 +77,13 @@ public class ChatMultiSalasWSEndpoint {
     @OnMessage
     public String OnMessage(Session s, @PathParam("sala")String sala, 
             @PathParam("username")String un, String message){
+        String nomeUsuario = getUsernamePorSessao(s);
         if(message.startsWith("send -u")){
-            enviar(s, sala, un, message);
+            enviar(s, sala, nomeUsuario, message);
         }else if(message.startsWith("send")){
-            enviarParaTodos(sala, un, message);
+            enviarParaTodos(sala, nomeUsuario, message);
         }else if(message.startsWith("rename")){
-            renomear(s, sala, un, message);
+            renomear(s, sala, nomeUsuario, message);
         }      
         return null;
     }
@@ -131,16 +137,25 @@ public class ChatMultiSalasWSEndpoint {
         //System.out.println(tamanhoNome + "\n" + msgComNome + "\n" + nome + "\n" + msgPura);
      
         ArrayList<Usuario> usuarios = salas.get(sala);
-        for(Usuario u : usuarios){
-            if(u.getUsername().equals(nome)){
-                try {
-                    u.getSession().getBasicRemote().sendText(usuario + " " + pegarHora() + 
+        if(!existeUsuario(nome)){
+            try {
+                s.getBasicRemote().sendText("O usuário não existe.");
+            } catch (IOException ex) {
+                Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            for(Usuario u : usuarios){
+                if(u.getUsername().equals(nome)){
+                    try {
+                        u.getSession().getBasicRemote().sendText(usuario + " " + pegarHora() + 
                             " reservadamente: " + msgPura);
-                } catch (IOException ex) {
-                    Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         }
+        
     }
     
     public void renomear(Session s, String sala, String user, String message){
@@ -148,7 +163,7 @@ public class ChatMultiSalasWSEndpoint {
         //verifica se já existe usuário com o nome informado
         if(existeUsuario(novoNome)){
             try {
-                s.getBasicRemote().sendText("Esse nome nao está disponível");
+                s.getBasicRemote().sendText("Nome de usuário já em uso");
             } catch (IOException ex) {
                 Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -159,7 +174,7 @@ public class ChatMultiSalasWSEndpoint {
                     if(u.getUsername().equals(user)){
                         u.setUsername(novoNome);
                         try {
-                            s.getBasicRemote().sendText("nome alterado com sucesso");
+                            s.getBasicRemote().sendText("Renomeado com sucesso");
                         } catch (IOException ex) {
                             Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -187,5 +202,17 @@ public class ChatMultiSalasWSEndpoint {
         String minutos = Integer.toString(calendar.get(Calendar.MINUTE));
         String horaCompleta = hora + ":" + minutos;
         return horaCompleta;
+    }
+    
+    public String getUsernamePorSessao(Session s){
+        for(String st: salas.keySet()){
+                ArrayList<Usuario> usuarios = salas.get(st);
+                for(Usuario u: usuarios){
+                    if(u.getSession().equals(s)){
+                        return u.getUsername();
+                    }
+                }
+            }
+        return "";
     }
 }
