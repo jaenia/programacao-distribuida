@@ -30,7 +30,7 @@ import javax.websocket.server.ServerEndpoint;
  * @author jaenia
  */
 
-@ServerEndpoint("/chat/{sala}/{username}")
+@ServerEndpoint("/chat/{sala}/{usuario}")
 public class ChatMultiSalasWSEndpoint {
     
     //salas com usuários
@@ -39,7 +39,7 @@ public class ChatMultiSalasWSEndpoint {
     
     @OnOpen
     public void onOpen(Session s, @PathParam("sala")String sala,
-            @PathParam("username")String username){
+            @PathParam("usuario")String username){
         
         Usuario user = new Usuario(s, username);
         
@@ -47,30 +47,30 @@ public class ChatMultiSalasWSEndpoint {
         if(salas.containsKey(sala)){
             if(!existeUsuario(username)){
                 salas.get(sala).add(user);
-                notificarOnline(sala);
+                atualizarOnline(sala);
             }else{
                 usuarioAnonimo(s, user);
                 salas.get(sala).add(user);
-                notificarOnline(sala);
+                atualizarOnline(sala);
             }    
         }else{ 
             if(!existeUsuario(username)){ 
-                usuarioAnonimo(s, user); 
                 salas.put(sala, new ArrayList<Usuario>()); 
                 salas.get(sala).add(user);
-                notificarOnline(sala);
+                atualizarOnline(sala);
             }else{
                 usuarioAnonimo(s, user);
+                atualizarOnline(sala);
             }
         }
     }
     
     @OnMessage
-    public String OnMessage(Session s, @PathParam("sala")String sala, 
-            @PathParam("username")String un, String message){
+    public String OnMessage(Session s, @PathParam("sala")String sala, String message){
+        //pega o username por sessão pois o mesmo pode ser renomeado, o que não altera a url
         String nomeUsuario = getUsernamePorSessao(s);
         if(message.startsWith("send -u")){
-            enviar(s, sala, nomeUsuario, message);
+            enviarReservada(s, sala, nomeUsuario, message);
         }else if(message.startsWith("send")){
             enviarParaTodos(sala, nomeUsuario, message);
         }else if(message.startsWith("rename")){
@@ -80,12 +80,12 @@ public class ChatMultiSalasWSEndpoint {
     }
     
     @OnClose
-    public void onClose(Session s, @PathParam("sala")String sala, @PathParam("username")String un){
+    public void onClose(Session s, @PathParam("sala")String sala){
         ArrayList<Usuario> usuarios = salas.get(sala);
         for(Usuario u : usuarios){
             if(u.getSession().equals(s)){
                 usuarios.remove(u);
-                notificarOnline(sala);
+                atualizarOnline(sala);
             }
         } 
     }
@@ -96,11 +96,11 @@ public class ChatMultiSalasWSEndpoint {
     }
     
     //verifica existência do usuário em todas as salas
-    public boolean existeUsuario(String usuario){
+    public boolean existeUsuario(String username){
         for(String st: salas.keySet()){
                 ArrayList<Usuario> usuarios = salas.get(st);
                 for(Usuario u: usuarios){
-                    if(u.getUsername().equals(usuario)){
+                    if(u.getUsername().equals(username)){
                         return true;
                     }
                 }
@@ -109,23 +109,24 @@ public class ChatMultiSalasWSEndpoint {
     }
     
     //verifica existência de usuário em uma sala específica
-    public boolean existeUsuarioNaSala(String nome, String sala){
+    public boolean existeUsuarioNaSala(String username, String sala){
         ArrayList<Usuario> usuarios = salas.get(sala);
         for(Usuario u : usuarios){
-            if(u.getUsername().equals(nome)){
+            if(u.getUsername().equals(username)){
                 return true;
             }
         }
         return false;
     }
     
-    public void enviarParaTodos(String sala, String usuario, String message){
+    //envia mensagem pública
+    public void enviarParaTodos(String sala, String username, String message){
         //trata mensagem
         String msgPura = message.substring(5);
         ArrayList<Usuario> usuarios = salas.get(sala);
         for(Usuario u : usuarios){
             try {
-                u.getSession().getBasicRemote().sendText(usuario + " " + getHora() + 
+                u.getSession().getBasicRemote().sendText(username + " " + getHora() + 
                             " : " + msgPura);
             } catch (IOException ex) {
                 Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
@@ -133,20 +134,19 @@ public class ChatMultiSalasWSEndpoint {
         }
     }
     
-    public void enviar(Session s, String sala, String usuario, String message){
+    //
+    public void enviarReservada(Session s, String sala, String username, String message){
         //trata mensagem
         String msgComNome = message.substring(8);
         String[] aux = msgComNome.split(" ");
         String nome = aux[0];
         int tamanhoNome = nome.length();
         String msgPura = msgComNome.substring(tamanhoNome + 1);
-        
-        //System.out.println(tamanhoNome + "\n" + msgComNome + "\n" + nome + "\n" + msgPura);
      
         ArrayList<Usuario> usuarios = salas.get(sala);
         if(!existeUsuarioNaSala(nome, sala)){
             try {
-                s.getBasicRemote().sendText("O usuário não existe.");
+                s.getBasicRemote().sendText("O usuário não existe na sala.");
             } catch (IOException ex) {
                 Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -154,7 +154,7 @@ public class ChatMultiSalasWSEndpoint {
             for(Usuario u : usuarios){
                 if(u.getUsername().equals(nome)){
                     try {
-                        u.getSession().getBasicRemote().sendText(usuario + " " + getHora() + 
+                        u.getSession().getBasicRemote().sendText(username + " " + getHora() + 
                             " reservadamente: " + msgPura);
                     } catch (IOException ex) {
                         Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
@@ -165,7 +165,7 @@ public class ChatMultiSalasWSEndpoint {
         
     }
     
-    public void renomear(Session s, String sala, String user, String message){
+    public void renomear(Session s, String sala, String username, String message){
         String novoNome = message.split(" ")[1];
         //verifica se já existe usuário com o nome informado
         if(existeUsuario(novoNome)){
@@ -178,22 +178,23 @@ public class ChatMultiSalasWSEndpoint {
             for(String st: salas.keySet()){
                 ArrayList<Usuario> usuarios = salas.get(st);
                 for(Usuario u: usuarios){
-                    if(u.getUsername().equals(user)){
+                    if(u.getUsername().equals(username)){
                         u.setUsername(novoNome);
                         try {
                             s.getBasicRemote().sendText("Renomeado com sucesso");
                         } catch (IOException ex) {
                             Logger.getLogger(ChatMultiSalasWSEndpoint.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        notificarRenomeacaoTodos(sala, user, "O usuario " + user + " alterou seu nome para " + novoNome);
-                        notificarOnline(sala);
+                        notificarRenomeacaoTodos(sala, "O usuario " + username + 
+                                " alterou seu nome para " + novoNome);
+                        atualizarOnline(sala);
                     }
                 }
             }
         }
     }
     
-    public void notificarRenomeacaoTodos(String sala, String remet, String message){
+    public void notificarRenomeacaoTodos(String sala, String message){
         ArrayList<Usuario> usuarios = salas.get(sala);
         for(Usuario u : usuarios){
             try {
@@ -204,10 +205,10 @@ public class ChatMultiSalasWSEndpoint {
         }
     }
     
-    public void notificarOnline(String sala){
+    //gera a informação dos usuários online por sala
+    public void atualizarOnline(String sala){
         String usersOnline = "";
-        
-        System.out.println("entrou no notificar online teste");
+    
         //todos os usuários da sala
         ArrayList<Usuario> usuarios = salas.get(sala);
         
@@ -246,6 +247,7 @@ public class ChatMultiSalasWSEndpoint {
         return "";
     }
     
+    //seta o nome default para usuário existente o notifica-o da razão
     public void usuarioAnonimo(Session s, Usuario usuario){
         usuario.setUsername("anônimo");
         try {

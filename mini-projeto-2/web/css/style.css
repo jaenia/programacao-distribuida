@@ -1,6 +1,6 @@
 body {
 	width: 100%;
-	font-family: font-family'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',sans-serif;
+	font-family: 'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',sans-serif;
 	color: #000;
 	background-color: #eee;
 	font-size: 10pt;
@@ -49,12 +49,18 @@ label {
 	line-height: 150%;
 }
 
+#messageArea {
+	width: 78.18%;
+	float: left;
+	padding-right: 20px;
+}
+
 #messages {
-	height: 300px;
+	height: 400px;
 	margin: 5px 0;
 	padding: 0 5px;
 	overflow: auto;
-	border: 1px dotted #777;
+	border: 1px solid #dcdcdc;
 	background-color: #fff;
 	line-height: 150%;
 }
@@ -64,16 +70,21 @@ label {
 	color: #000;
 }
 
-#messages pre.sent {
-	color: #f63;
+#usersArea{
+	width: 20%;
+	float: left;
 }
 
 #users {
-	height: 150px;
+	height: 400px;
 	margin: 5px 0;
-	padding: 0 5px;
+	padding-left: 15px;
 	overflow: auto;
-	border: 1px dotted #777;
+	border: 1px solid #dcdcdc;
 	background-color: #fff;
 	line-height: 150%;
+}
+
+.titleUsers{
+	padding-bottom: 7px;
 }

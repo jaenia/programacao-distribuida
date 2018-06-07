@@ -75,10 +75,11 @@ new function() {
 			addUsers(data);
 		}else{
 			var msg = $('<pre>').text(data);
-			if (type === 'SENT') {
+			/*if (type === 'SENT') {
 				msg.addClass('sent');
-			}
+			}*/
 			var messages = $('#messages');
+
 			messages.append(msg);
 			//console.log(msg);
 			
@@ -127,7 +128,7 @@ new function() {
 			
 			sendButton.click(function(e) {
 				var msg = $('#sendMessage').val();
-				addMessage(msg, 'SENT');
+				//addMessage(msg, 'SENT');
 				ws.send(msg);
 			});
 			
