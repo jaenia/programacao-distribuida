@@ -37,11 +37,11 @@ public class Filme {
         this.anoLancamento = anoLancamento;
     }
 
-    /*public int getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(int id) {
+    /*public void setId(int id) {
         this.id = id;
     }*/
 
@@ -84,6 +84,10 @@ public class Filme {
     public void setAnoLancamento(String anoLancamento) {
         this.anoLancamento = anoLancamento;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Filme{" + "id=" + id + ", titulo=" + titulo + ", diretor=" + diretor + 
+                ", estudio=" + estudio + ", genero=" + genero + ", anoLancamento=" + anoLancamento + '}';
+    }
 }
