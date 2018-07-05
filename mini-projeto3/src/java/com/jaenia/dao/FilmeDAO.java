@@ -17,20 +17,23 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
  * @author jaeni
  */
 public class FilmeDAO {
+    
+    private static Session session;
+    
     public void adicionarFilme(Filme f){
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        session = HibernateUtil.getSessionFactory().openSession();
 
         session.beginTransaction();
         session.save(f);
         session.getTransaction().commit();
         System.out.println("Filme adicionado com sucesso!");
-        session.close();
+        /*session.close();
         HibernateUtil.getSessionFactory().close();
-        StandardServiceRegistryBuilder.destroy(HibernateUtil.getStandardServiceRegistry());
+        StandardServiceRegistryBuilder.destroy(HibernateUtil.getStandardServiceRegistry());*/
     }
     
     public void alterarTituloFilme(int id, String novoTitulo){
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
         
         Filme filme = (Filme) session.load(Filme.class, id); 
@@ -40,14 +43,14 @@ public class FilmeDAO {
         session.getTransaction().commit();
         System.out.println("Alteracao feita com sucesso!");
         System.out.println(filme.toString());
-        session.close();
+        /*session.close();
         HibernateUtil.getSessionFactory().close();
-        StandardServiceRegistryBuilder.destroy(HibernateUtil.getStandardServiceRegistry());
+        StandardServiceRegistryBuilder.destroy(HibernateUtil.getStandardServiceRegistry());*/
     }
     
     public List<Filme> consultarFilme(String consulta){
         List<Filme> filmes = new ArrayList<Filme>();
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        session = HibernateUtil.getSessionFactory().openSession();
 
         session.beginTransaction();
         
@@ -64,16 +67,16 @@ public class FilmeDAO {
        
         session.getTransaction().commit();
   
-        session.close();
+        /*session.close();
         
         HibernateUtil.getSessionFactory().close();
-        StandardServiceRegistryBuilder.destroy(HibernateUtil.getStandardServiceRegistry());
+        StandardServiceRegistryBuilder.destroy(HibernateUtil.getStandardServiceRegistry());*/
         
         return filmes;
     }
     
     public String excluirFilme(int id){
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        session = HibernateUtil.getSessionFactory().openSession();
         
         Filme f = (Filme) session.load(Filme.class, id); 
         
@@ -87,10 +90,10 @@ public class FilmeDAO {
         session.delete(f); //exclui o objeto da sessão
         session.getTransaction().commit();
         System.out.println("Exclusão feita com sucesso!");
-        session.close();
+        /*session.close();
         
         HibernateUtil.getSessionFactory().close();
-        StandardServiceRegistryBuilder.destroy(HibernateUtil.getStandardServiceRegistry());
+        StandardServiceRegistryBuilder.destroy(HibernateUtil.getStandardServiceRegistry());*/
         
         return "Dados do filme excluído: \n" + dadosFilme;
     }
