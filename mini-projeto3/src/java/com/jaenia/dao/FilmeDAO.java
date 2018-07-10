@@ -32,17 +32,24 @@ public class FilmeDAO {
         StandardServiceRegistryBuilder.destroy(HibernateUtil.getStandardServiceRegistry());*/
     }
     
-    public void alterarTituloFilme(int id, String novoTitulo){
+    public void alterarTituloFilme(String antigoTitulo, String novoTitulo){
+        List<Filme> filmes = new ArrayList<Filme>();
         session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
         
-        Filme filme = (Filme) session.load(Filme.class, id); 
+        filmes = session.createQuery
+                    ("select f from Filme f where f.titulo = :antigoTitulo").
+                            setParameter("antigoTitulo", antigoTitulo).list();
         
-        filme.setTitulo(novoTitulo);
-        session.update(filme);
-        session.getTransaction().commit();
+        for(Filme f : filmes){
+            f.setTitulo(novoTitulo);
+            session.update(f);
+            session.getTransaction().commit();
+            System.out.println(f.toString());
+        }
+        
         System.out.println("Alteracao feita com sucesso!");
-        System.out.println(filme.toString());
+        
         /*session.close();
         HibernateUtil.getSessionFactory().close();
         StandardServiceRegistryBuilder.destroy(HibernateUtil.getStandardServiceRegistry());*/
@@ -60,7 +67,7 @@ public class FilmeDAO {
         }else{
             filmes = session.createQuery
                     ("select f from Filme f where f.titulo like :consulta OR "
-                            + "f.diretor like :consulta OR f.estudio like :consulta OR "
+                            + "f.diretor like :consulta OR "
                             + "f.genero like :consulta OR f.anoLancamento like :consulta").
                             setParameter("consulta", consulta).list();
         }
@@ -75,20 +82,28 @@ public class FilmeDAO {
         return filmes;
     }
     
-    public String excluirFilme(int id){
+    public String excluirFilme(String titulo){
+        List<Filme> filmes = new ArrayList<Filme>();
+        String dadosFilme = "";
         session = HibernateUtil.getSessionFactory().openSession();
         
-        Filme f = (Filme) session.load(Filme.class, id); 
+        session.beginTransaction();
         
-        String dadosFilme = "Título: " + f.getTitulo() + "\n" +
+        filmes = session.createQuery
+                    ("select f from Filme f where f.titulo = :titulo").
+                            setParameter("titulo", titulo).list();
+        
+        for(Filme f : filmes){
+            dadosFilme = "Título: " + f.getTitulo() + "\n" +
                 "Diretor: " + f.getDiretor() + "\n" +
                 "Estúdio: " + f.getEstudio() + "\n" +
                 "Gênero: " + f.getGenero() + "\n" +
                 "Ano de lançamento: " + f.getAnoLancamento();
-                            
-        session.beginTransaction();
-        session.delete(f); //exclui o objeto da sessão
-        session.getTransaction().commit();
+            System.out.println(f.toString());
+            session.delete(f);
+            session.getTransaction().commit();
+        } 
+        
         System.out.println("Exclusão feita com sucesso!");
         /*session.close();
         

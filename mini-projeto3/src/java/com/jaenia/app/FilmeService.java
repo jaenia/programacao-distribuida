@@ -34,9 +34,10 @@ public class FilmeService {
     } 
     
     @WebResult(name="mensagem")
-    public String renomearFilme(@WebParam(name="id") int idFilme, @WebParam(name="novoTitulo") String novoTitulo){
+    public String renomearFilme(@WebParam(name="antigoTitulo") String antigoTitulo, 
+            @WebParam(name="novoTitulo") String novoTitulo){
         
-        filmeDAO.alterarTituloFilme(idFilme, novoTitulo);
+        filmeDAO.alterarTituloFilme(antigoTitulo, novoTitulo);
         return "Titulo do filme alterado com sucesso!";
     }
     
@@ -46,8 +47,8 @@ public class FilmeService {
     }
     
     @WebResult(name="mensagem")
-    public String excluirFilme(@WebParam(name="id") int idFilme){
-        return filmeDAO.excluirFilme(idFilme);
+    public String excluirFilme(@WebParam(name="titulo") String titulo){
+        return filmeDAO.excluirFilme(titulo);
     }
     
     /**
