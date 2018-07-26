@@ -40,7 +40,8 @@
 			echo "Resultado de " . $operacao . ": ";
 			//var_dump($resultado->filmesEncontrados);
 
-			echo "<table border=1>";
+			if(is_array($resultado->filmesEncontrados)){
+				echo "<table border=1>";
 				echo "<tr>";
 				echo "<th>Título</th>";
 				echo "<th>Diretor</th>";
@@ -49,17 +50,35 @@
 				echo "<th>Ano de lançamento</th>";
 				echo "</tr>";
 				
-			foreach ($resultado->filmesEncontrados as $key => $value) {
-				echo "<tr>";
-				echo "<td>$value->titulo</td>";
-				echo "<td>$value->diretor</td>";
-				echo "<td>$value->estudio</td>";
-				echo "<td>$value->genero</td>";
-				echo "<td>$value->anoLancamento</td>";
-				echo "</tr>";
-			}
+				foreach ($resultado->filmesEncontrados as $key => $value) {
+					echo "<tr>";
+					echo "<td>$value->titulo</td>";
+					echo "<td>$value->diretor</td>";
+					echo "<td>$value->estudio</td>";
+					echo "<td>$value->genero</td>";
+					echo "<td>$value->anoLancamento</td>";
+					echo "</tr>";
+				}
 
-			echo "</table>";
+				echo "</table>";
+			}else{
+				echo "<table border=1>";
+				echo "<tr>";
+				echo "<th>Título</th>";
+				echo "<th>Diretor</th>";
+				echo "<th>Estúdio</th>";
+				echo "<th>Gênero</th>";
+				echo "<th>Ano de lançamento</th>";
+				echo "</tr>";
+				echo "<tr>";
+				echo "<td>".$resultado->filmesEncontrados->titulo."</td>";
+				echo "<td>".$resultado->filmesEncontrados->diretor."</td>";
+				echo "<td>".$resultado->filmesEncontrados->estudio."</td>";
+				echo "<td>".$resultado->filmesEncontrados->genero."</td>";
+				echo "<td>".$resultado->filmesEncontrados->anoLancamento."</td>";
+				echo "</tr>";
+				echo "</table>";
+			}
 		}
 	}
 ?>
