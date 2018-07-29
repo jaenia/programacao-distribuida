@@ -15,6 +15,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -38,7 +39,7 @@ public class FilmesResource {
     public FilmesResource() {
     }
     
-    //criar um filme
+    //criar filme
     @POST
     @Path("cadastrar")
     @Produces(MediaType.APPLICATION_JSON)
@@ -65,19 +66,34 @@ public class FilmesResource {
         return Response.ok(filme, MediaType.APPLICATION_JSON).build();
     }
 
+    //atualizar filme
+    @PUT
+    @Path("renomear/{id}/{novoTitulo}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response atualizar(@PathParam("id") String id, @PathParam("novoTitulo") String novoTitulo){
+        //resgatar o filme através do id informado
+        List<FilmeResource> filmes = filmeDAO.consultarFilme(id);
+        if(filmes.isEmpty()){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        FilmeResource filme = filmes.get(0);
+        filmeDAO.alterarTituloFilme(id, novoTitulo);
+        List<FilmeResource> filmes2 = filmeDAO.consultarFilme(id);
+        return Response.ok(filmes2.get(0), MediaType.APPLICATION_JSON).build();    
+    }
+    
+    
     /**
      * Sub-resource locator method for {id}
      */
     @GET
     @Path("{id}")
     public FilmeResource getFilmeResource(@PathParam("id") String id) {
-        System.out.println("entrou");
-        List<FilmeResource> filmes = filmeDAO.consultarFilme("");
-        for(FilmeResource f : filmes){
-            if(Integer.toString(f.getId()).equals(id)){
-                return f;
-            }
+        List<FilmeResource> filmes = filmeDAO.consultarFilme(id);
+        if(!filmes.isEmpty()){
+            return filmes.get(0);
         }
+        
         return null;
     }
 }

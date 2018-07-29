@@ -32,23 +32,28 @@ public class FilmeDAO {
         StandardServiceRegistryBuilder.destroy(HibernateUtil.getStandardServiceRegistry());*/
     }
     
-    public void alterarTituloFilme(String antigoTitulo, String novoTitulo){
+    public FilmeResource alterarTituloFilme(String id, String novoTitulo){
         List<FilmeResource> filmes = new ArrayList<FilmeResource>();
         session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
         
-        filmes = session.createQuery
+        /*filmes = session.createQuery
                     ("select f from FilmeResource f where f.titulo = :antigoTitulo").
-                            setParameter("antigoTitulo", antigoTitulo).list();
+                            setParameter("antigoTitulo", antigoTitulo).list();*/
         
-        for(FilmeResource f : filmes){
+        FilmeResource filme = (FilmeResource) session.load(FilmeResource.class, Integer.parseInt(id));
+        filme.setTitulo(novoTitulo);
+        session.update(filme);
+        session.getTransaction().commit();
+        
+        /*for(FilmeResource f : filmes){
             f.setTitulo(novoTitulo);
             session.update(f);
             session.getTransaction().commit();
             System.out.println(f.toString());
-        }
+        }*/
         
-        System.out.println("Alteracao feita com sucesso!");
+        return filme;
         
         /*session.close();
         HibernateUtil.getSessionFactory().close();
@@ -66,7 +71,8 @@ public class FilmeDAO {
                     ("select f from FilmeResource f").list();
         }else{
             filmes = session.createQuery
-                    ("select f from FilmeResource f where f.titulo like :consulta OR "
+                    ("select f from FilmeResource f where f.id like :consulta OR "
+                            + "f.titulo like :consulta OR "
                             + "f.diretor like :consulta OR "
                             + "f.genero like :consulta OR f.anoLancamento like :consulta").
                             setParameter("consulta", consulta).list();
