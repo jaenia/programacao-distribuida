@@ -17,6 +17,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * REST Web Service
@@ -26,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 
 @Entity
 @Table(name="filme")
+@XmlRootElement
 public class FilmeResource {
     
     @Id
