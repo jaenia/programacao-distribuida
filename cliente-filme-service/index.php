@@ -4,6 +4,8 @@
 		<title>Home - Filmes - Mini Projeto 3</title>
 		<meta charset="utf-8">
 	</head>
+	
+	
 	<body>
 		<center>
 			<p>Sou o index.php</p>
